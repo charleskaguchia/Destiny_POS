@@ -1,0 +1,15 @@
+Django>=5.0
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+mysqlclient
+celery
+redis
+python-dotenv
+drf-spectacular
+django-filter
+django-extensions
+pytest-django
+pytest
+flake8
+black

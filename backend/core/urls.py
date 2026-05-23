@@ -19,9 +19,15 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
     # Apps
+<<<<<<< HEAD
     # path('api/users/', include('apps.users.urls')),
     # path('api/inventory/', include('apps.inventory.urls')),
     # path('api/sales/', include('apps.sales.urls')),
+=======
+    path('api/users/', include('apps.users.urls')),
+    path('api/inventory/', include('apps.inventory.urls')),
+    path('api/sales/', include('apps.sales.urls')),
+>>>>>>> d5e799f (Refactor: Migrate to decoupled Django 5.0 and React 19 architecture)
     # path('api/shifts/', include('apps.shifts.urls')),
     # path('api/debt/', include('apps.debt.urls')),
 ]

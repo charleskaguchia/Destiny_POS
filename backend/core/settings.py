@@ -95,6 +95,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+<<<<<<< HEAD
+=======
+        'rest_framework.authentication.SessionAuthentication',
+>>>>>>> d5e799f (Refactor: Migrate to decoupled Django 5.0 and React 19 architecture)
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -103,6 +107,11 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+<<<<<<< HEAD
+=======
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+>>>>>>> d5e799f (Refactor: Migrate to decoupled Django 5.0 and React 19 architecture)
 }
 
 # Simple JWT Settings

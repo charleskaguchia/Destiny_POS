@@ -1,43 +1,79 @@
+<<<<<<< HEAD
 import React, { useState } from 'react'
+=======
+import React, { useState, useMemo, useEffect } from 'react'
+import axios from 'axios'
+>>>>>>> d5e799f (Refactor: Migrate to decoupled Django 5.0 and React 19 architecture)
 import StatsBentoGrid from './StatsBentoGrid'
 import InventoryList from './InventoryList'
 import InventoryModal from './InventoryModal'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
-import { Search, Plus, Filter } from 'lucide-react'
-
-const INITIAL_INVENTORY = [
-  { id: 1, name: 'Lifebuoy Soap 150g', category: 'Personal Care', stock: 156, unit: 'Pieces', price: 120, status: 'In Stock' },
-  { id: 2, name: 'Jogoo Maize Meal 2kg', category: 'FMCG', stock: 48, unit: 'Bales', price: 2150, status: 'Low Stock' },
-  { id: 3, name: 'Panadol Extra', category: 'OTC Drugs', stock: 890, unit: 'Tablets', price: 15, status: 'In Stock' },
-  { id: 4, name: 'Blue Band 500g', category: 'FMCG', stock: 12, unit: 'Pieces', price: 340, status: 'Critical' },
-]
+import { Search, Plus, Filter, Loader2, AlertCircle } from 'lucide-react'
 
 const InventoryPage = () => {
-  const [inventory, setInventory] = useState(INITIAL_INVENTORY)
+  const [inventory, setInventory] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All Categories')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
 
+<<<<<<< HEAD
   const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.category.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === 'All Categories' || item.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+=======
+  useEffect(() => {
+    fetchInventory()
+  }, [])
 
-  const handleSave = (formData) => {
-    if (editingItem) {
-      setInventory(prev => prev.map(item => item.id === editingItem.id ? { ...formData, id: item.id } : item))
-    } else {
-      setInventory(prev => [...prev, { ...formData, id: Date.now() }])
+  const fetchInventory = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await axios.get('http://127.0.0.1:8000/api/inventory/products/')
+      
+      // Handle both paginated and non-paginated responses
+      const data = Array.isArray(response.data) ? response.data : (response.data?.results || [])
+      setInventory(data)
+    } catch (err) {
+      setError('Connection Error: Is the backend running at http://127.0.0.1:8000?')
+      console.error('Inventory fetch error:', err)
+      setInventory([])
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const filteredInventory = useMemo(() => {
+    if (!Array.isArray(inventory)) return []
+    
+    return inventory.filter(item => {
+      const name = item?.name || ''
+      const category = item?.category || ''
+      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           category.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCategory = selectedCategory === 'All Categories' || category === selectedCategory
+      return matchesSearch && matchesCategory
+    })
+  }, [inventory, searchTerm, selectedCategory])
+>>>>>>> d5e799f (Refactor: Migrate to decoupled Django 5.0 and React 19 architecture)
+
+  const handleSave = async (formData) => {
+    // Note: Full implementation of save would involve POST/PUT to backend
+    // For now, we'll re-fetch to see changes if backend is updated
+    fetchInventory()
     handleCloseModal()
   }
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
+      // In a real app: await axios.delete(`.../${id}/`)
       setInventory(prev => prev.filter(item => item.id !== id))
     }
   }
@@ -56,7 +92,7 @@ const InventoryPage = () => {
     alert('Exporting inventory list (CSV)...')
   }
 
-  const categories = ['All Categories', 'Personal Care', 'FMCG', 'OTC Drugs']
+  const categories = ['All Categories', 'Personal Care', 'FMCG', 'OTC Drugs', 'Beverages']
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -102,11 +138,31 @@ const InventoryPage = () => {
           </div>
         </div>
 
-        <InventoryList 
-          items={filteredInventory} 
-          onDelete={handleDelete} 
-          onEdit={handleEdit} 
-        />
+        {loading ? (
+          <div className="py-20 flex flex-col items-center justify-center text-secondary/40 gap-4">
+            <Loader2 className="w-8 h-8 animate-spin" />
+            <p className="font-label font-bold text-xs uppercase tracking-widest">Fetching live inventory...</p>
+          </div>
+        ) : error ? (
+          <div className="py-20 flex flex-col items-center justify-center text-tertiary gap-4 bg-tertiary/5 rounded-3xl border border-tertiary/10 px-4 text-center">
+            <AlertCircle className="w-8 h-8" />
+            <div>
+              <p className="font-headline font-bold">{error}</p>
+              <button 
+                onClick={fetchInventory}
+                className="mt-2 text-xs font-label font-black uppercase tracking-widest underline underline-offset-4 hover:text-tertiary/70 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : (
+          <InventoryList 
+            items={filteredInventory} 
+            onDelete={handleDelete} 
+            onEdit={handleEdit} 
+          />
+        )}
       </div>
 
       <InventoryModal 
